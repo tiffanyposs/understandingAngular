@@ -6,6 +6,7 @@
 ###Big Words Defined
 
 * **Dependency Injection** - Giving a function an object. Rather than creating an object inside of a function, you pass it to a function.
+* **Minification** - Shrinking the size of files for faster download.
 
 ####Problems Angular is trying
 
@@ -268,7 +269,49 @@ Which tells you the name of this dependency is `ngMessages`. Now we need to incl
 
 ```
 
+###Dependency Injection and Minification
+
+* **Minification** - Shrinking the size of files for faster download.
 
 
+In the real world we want to minify our js files so they are faster to download. Many minifiers will replace variables with shorter one letter variables to save space. This can be an issue with the **dependency injection** method we used earlier.
+
+Before:
 
 
+```
+  var myApp = angular.module('myApp', ['ngMessages']);
+
+  myApp.controller('mainController', function($scope, $log) {
+      console.log($scope, $log);
+  });
+
+```
+After:
+
+```
+  var myApp=angular.module("myApp",["ngMessages"]);myApp.controller("mainController",function(o,l){console.log(o,l)});
+
+```
+
+See how the params were replaced with single letter variables, unfortunately this will throw an error now, but there is an alternative method.
+
+See below the updated version of the sample code. The second parameter we pass to the `controller` is now an array. In that array you pass in the dependiencies as strings, with the final element in the array being the original function that passes in the variables. Angular knows to pass in the initial elements in the array into the params, so when you minify this it will now not break when the variables change. Remember, the order matters here, they match up by index.
+
+Minify here: [http://refresh-sf.com/](http://refresh-sf.com/)
+
+```
+var myApp = angular.module('myApp', ['ngMessages']);
+
+myApp.controller('mainController', ['$scope', '$log', function($scope, $log) {
+    $log.log($scope);
+}]);
+
+```
+
+See minified version below with updated variable names.
+
+```
+var myApp=angular.module("myApp",["ngMessages"]);myApp.controller("mainController",["$scope","$log",function(o,l){l.log(o)}]);
+
+```
