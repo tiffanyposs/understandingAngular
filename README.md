@@ -6,6 +6,7 @@
 ###Big Words Defined
 
 * **Dependency Injection** - Giving a function an object. Rather than creating an object inside of a function, you pass it to a function.
+* **Interpolation** - Creating a string by combining a string and placeholders.
 * **Minification** - Shrinking the size of files for faster download.
 
 ####Problems Angular is trying
@@ -315,3 +316,35 @@ See minified version below with updated variable names.
 var myApp=angular.module("myApp",["ngMessages"]);myApp.controller("mainController",["$scope","$log",function(o,l){l.log(o)}]);
 
 ```
+
+
+###Scope and Interpolation
+
+In Angular & Handlebars you can use **Interpolation**. **Interpolation** means creating a string by combining a string and placeholders. The example below shows how you can use Angular and Handlebars to interpolate the *name* variable and a string.
+
+```
+    <div ng-controller="mainController">
+        <h1>{{ name + ", How are you?"}}.</h1>
+    </div>
+
+```
+
+Within your `app.js` file you can also demonstrate how it will sync the data automatically. See below we inject the dependencies `$scope` and `$timeout` into the project, then we set the scope variable `name` equal to a string, but then after 3 seconds using the $timeout feature we change it. In the browser it will be the initial name "Jeff" for 3 seconds then switch to "Everybody".
+
+```
+var myApp = angular.module('myApp', []);
+
+myApp.controller('mainController', ['$scope', '$timeout', function($scope, $timeout) {
+    $scope.name = "Jeff";
+    
+    $timeout(function() {
+        $scope.name = "Everybody";
+    }, 3000);
+}]);
+
+```
+
+
+###Directives and Two Way Data Binding
+
+ 

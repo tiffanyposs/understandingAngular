@@ -1,3 +1,15 @@
+
+var myApp = angular.module('myApp', []);
+
+myApp.controller('mainController', ['$scope', '$timeout', function($scope, $timeout) {
+    $scope.name = "Tiffany";
+    
+    $timeout(function() {
+        $scope.name = "Everybody";
+    }, 3000);
+}]);
+
+
 //var myApp = angular.module('myApp', ['ngMessages', 'ngResource']);
 //
 //myApp.controller('mainController', function($scope, $log, $filter, $resource) {
@@ -15,11 +27,6 @@
 //
 
 
-var myApp = angular.module('myApp', ['ngMessages']);
-
-myApp.controller('mainController', ['$scope', '$log', function($scope, $log) {
-    $log.log($scope);
-}]);
 
 //var myApp=angular.module("myApp",["ngMessages"]);myApp.controller("mainController",["$scope","$log",function(o,l){l.log(o)}]);
 
