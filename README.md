@@ -6,6 +6,10 @@
 ###Big Words Defined
 
 * **Dependency Injection** - Giving a function an object. Rather than creating an object inside of a function, you pass it to a function.
+* **Directive** - An instruction to Angular.js to manipulate a piece of the DOM
+  * "Add a Class"
+  * "Hide This"
+  * "Create This" 
 * **Interpolation** - Creating a string by combining a string and placeholders.
 * **Minification** - Shrinking the size of files for faster download.
 
@@ -347,4 +351,55 @@ myApp.controller('mainController', ['$scope', '$timeout', function($scope, $time
 
 ###Directives and Two Way Data Binding
 
- 
+**Directives** are ways to manipulate the pieces of the DOM to do what you want it to do. "Hide This", "Add a class to this", and "Create this" are example of things you can do with Directives
+
+
+We've already used the `ng-app` and `ng-controller` directives. Now we are going to use the  `ng-model` directive to create two way data binding. This live updates user input into data then live outputs it to the screen.
+
+The set up is easy. Within your `index.html` you can set a `ng-model` attribute on a input box to be equal to a `$scope` variable name. See we also *interpolate* using handlebars in the `<h1>` tag the same `$scope` variable.
+
+```
+    <div ng-controller="mainController">
+       <div>
+          <label>What is your twitter handle?</label>
+          <input type="text" ng-model="handle"/>
+       </div>
+       </ hr>
+       <h1>twitter.com/{{ handle }}</h1>
+    </div>
+
+```
+
+Over in our `app.js` file we simple just create the `$scope.handle` variable. Right now we set it to nothing, but when you launch the application you will see that it will live update the `handle` variable within the `<h1>` based on the input.
+
+```
+var myApp = angular.module('myApp', []);
+
+myApp.controller('mainController', ['$scope', function($scope) {
+    
+     $scope.handle = '';
+    
+}]);
+
+```
+
+You can also do two way data binding and apply filters to the data that comes in, and output the filtered data. For Example in your `app.js`, after you inject the `$filter` dependency you can create a function that returns the lowercase version of the `handle` variable.
+
+```
+myApp.controller('mainController', ['$scope', '$filter', function($scope, $filter) {
+    
+    $scope.handle = '';
+    $scope.lowercaseHandle = function() {
+        return $filter('lowercase')($scope.handle);
+    } 
+
+}]);
+
+```
+
+Then in your html, you can just call that function instead of passing it `handle` directly.
+
+```
+  <h1>twitter.com/{{ lowercaseHandle() }}</h1>
+
+```
