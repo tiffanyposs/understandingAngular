@@ -444,3 +444,211 @@ In this use case there is a dependency that you can inject to avoid having to us
 ```
 
 
+###Common Directives
+
+Angular has many directives that do a variety of different things.
+
+####ng-if
+
+`ng-if` you can add to your html and set it equal to some JS expression that you can set to true or false, then that tag will show or hide depending on if it's value is true or false. See the below example we are checking with `ng-if` if the length of *handle* is equal to characters (a $scope variable we set in app.js). If it's true it will show the div, if it's false it will remove it from the DOM.
+
+```
+    <div class="alert" ng-if="handle.length !== characters">
+        Must be 5 characters.
+    </div>
+```
+
+
+####ng-show & ng-hide
+
+`ng-show` and `ng-hide` are very similar to ng-if, but it will add a `display: none !important` with the class ng-hide. You also set it's value to a JS expression. `ng-show` with show if its true, and `ng-hide` will hide if it is true.
+
+So the below two examples would produce the same view, just different ways of doing it.
+
+```
+    <div class="alert" ng-show="handle.length !== characters">
+        Must be 5 characters.
+    </div>
+
+```
+
+
+```
+    <div class="alert" ng-hide="handle.length === characters">
+        Must be 5 characters.
+    </div>
+
+```
+
+####ng-class
+
+With `ng-class` you can pass in a JSON object where the keys are class names and the values are JS expressions that return true or false. If true that class gets added to element if false it is removed. Below we use some Bootstrap classes to add different styling to the element based on the length of the *handles* variable.
+
+```
+    <div class="alert" ng-class="{ 'alert-warning': handle.length < characters, 'alert-danger': handle.length > characters }" ng-show="handle.length !== characters">
+          Must be 5 characters.
+    </div>
+
+```
+
+Now we take it a step further by adding show directives to new elements inside of the one we just created. The parent div handles the showing and hiding of the alert at all based on the length of the handle variable, while the child divs control which version of the alert is shown based on the length of the *handle* variable
+
+```
+    <div class="alert" ng-class="{ 'alert-warning': handle.length < characters, 'alert-danger': handle.length > characters }" ng-show="handle.length !== characters">
+        <div ng-show="handle.length < characters">
+            You have less than {{ characters }} characters.
+        </div>
+        <div ng-show="handle.length > characters">
+            You have more than {{ characters }} characters.
+        </div>
+     </div>
+
+```
+
+####ng-repeat
+
+Allows you to loop though a variable that is an array.
+
+For example if you create a variable in your `$scope` that is equal to an array of objects.
+
+```
+    $scope.rules = [
+        
+        {rulename: "Must be 5 characters."},
+        {rulename: "Must not be used elsewhere."},
+        {rulename: "Must be cool"}
+        
+    ];
+
+```
+
+In your html you can sync it up and loop through it to display it on the page using `ng-repeat`, you just set it equal to "rule in rules", the second variable name being the name of the variable in $scope. Then you can call the object keys from the object. It will loop through it and create that element once for every object in the array. In this case it will be 3 `<li>` tags.
+
+```
+    <h3>Rules</h3>
+    <ul>
+        <li ng-repeat="rule in rules">
+            {{ rule.rulename }}
+        </li>
+    </ul>
+
+```
+
+####ng-click
+
+`ng-click` allows you to trigger a function from the $scope. You can create a function in the controller like the one below.
+
+```
+  $scope.alertClick = function () {
+      alert('Clicked!');
+  };
+
+```
+
+Then you can set `ng-click` equal to the function call. So when you click the button the function will run.
+
+```
+  <input type="button" value="click me" ng-click="alertClick()" />
+
+```
+
+####ng-cloak
+
+`ng-cloak` is an Angular property that allows you to hide an element until Angular gets to thit. This prevents a flicker on slow internet connections that might cause an user to see the templating `{{}}` before Angular renders the variable.
+
+```
+  <div ng-cloak>{{ name }}</div>
+
+```
+
+####Finding more Directives
+
+You can find a list of all the directives at this link: [https://docs.angularjs.org/api/ng/directive](https://docs.angularjs.org/api/ng/directive)
+
+
+###XMLHTTPRequest Object & $http
+
+Lets pretend we have a database in our project. Traditionally you would use all of this code to access your api to get data using pure Javascript. jQuery has the wrapper of $ajax that you can make this request much simpler. Below you see an example of what you would have to write to make an ajax request in Angular if you had to use pure JavaScript:
+
+```
+    var rulesrequest = new XMLHTTPRequest();
+    rulesrequest.onreadystatechange = function () {
+        $scope.$apply(function() {
+            if(rulesrequest.readyState == 4 && rulesrequest.status == 200) {
+                $scope.rules = JSON.parse(rulesrequest.responseText);
+            }
+        });
+    };
+    
+    rulesrequest.open('GET', 'http://localhost:54765/api', true);
+    rulesrequest.send();
+
+```
+
+####$http
+
+Once you inject the `$http` dependency into your `app.js` file you can use it to make ajax requests. 
+
+#####$http.get
+
+In the below example we are using the [Random User API](https://randomuser.me/documentation) as an example to make a GET request. Normally you would be able to set up a server then access your own data.
+
+In the below example you use `$http.get` and pass in the API endpoint. From there you can chain `.success` and `.error`. Success will give you the results, then you can set a $scope object to the results.
+
+```
+  $http.get('https://randomuser.me/api/')
+        .success(function (result) {
+            $scope.user = result.results[0];
+         })
+         .error(function (data, status) {
+             console.log(data, error)
+         });
+
+```
+
+Then in the HTML you can do the same templating we've been doing
+
+```
+  <div>
+      <img ng-src={{user.picture.large}}>
+      <p>{{user.name.title}}. {{user.name.first}} {{user.name.last}}</p>
+  </div>
+
+```
+
+#####$http.post
+
+You can also post to your database through Angular. Say you set up the below input box attached the the model "newRule". then you create a button that has a `ng-click` of a function *addRule*
+
+```
+    <div>
+        <label>Add Rule: </label>
+        <input type="text" ng-model="newRule"/>
+        <a href="#" class="btn btn-default" ng-click="addRule()">Add</a>
+    </div>
+
+```
+
+Imagin you already have your database set up with some *rules* and you have a scope variable set to it. 
+
+* Create the `newRule` variable and set it to empty initially. This is the model the input box is based off of. 
+* Create the scope function `addRule`, and with `$http.post` we pass in the endpoint we set up on our server as the first argument, then the data object we want to post to this url.
+* Then on `.success` we run the function that sets the `$scope.rules` variable to the results we get back, and set `$scope.newRule` to an empty string again.
+* Lastly we add the `.error` part
+
+This code will update the rules list dynamically as we make the post request through the imput box.
+
+```
+    $scope.newRule = '';
+    $scope.addRule = function () {
+        $http.post('/api/endpoint', {
+            newRule: $scope.newRule
+        }).success(function (result) {
+            $scope.rules = result;
+            $scope.newRule = '';
+        }).error(function (data, status) {
+           console.log(data, status); 
+        });
+    };
+
+```

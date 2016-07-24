@@ -16,7 +16,6 @@
         
         <!-- load angular via CDN -->
         <script src="//code.angularjs.org/1.3.0-rc.1/angular.min.js"></script>
-        <script src="//code.angularjs.org/1.5.0-rc.2/angular-resource.min.js"></script>
         <script src="app.js"></script>
     </head>
     <body>
@@ -38,9 +37,59 @@
         <div class="container">
 
             <div ng-controller="mainController">
-              <h1>{{ name + ", How are you?"}}.</h1>
-            </div>
+                <div>
+                  <label>What is your twitter handle?</label>
+                  <input type="text" ng-model="handle"/>
+                </div>
+                
+<!--
+                <div class="alert" ng-if="handle.length !== characters">
+                  Must be 5 characters.
+                </div>
+-->
+                
+<!--
+                <div class="alert" ng-hide="handle.length === characters">
+                  Must be 5 characters.
+                </div>
+-->
+                
+                <div class="alert" ng-class="{ 'alert-warning': handle.length < characters, 'alert-danger': handle.length > characters }" ng-show="handle.length !== characters">
+                    <div ng-show="handle.length < characters">
+                      You have less than {{ characters }} characters.
+                    </div>
+                    <div ng-show="handle.length > characters">
+                      You have more than {{ characters }} characters.
+                    </div>
+                </div>
+                
+                </ hr>
+                <h1>twitter.com/{{ lowercaseHandle() }}</h1>
             
+                <h3>Rules</h3>
+                <ul>
+                    <li ng-repeat="rule in rules">
+                        {{ rule.rulename }}
+                    </li>
+                </ul>
+            
+                <div>
+                    <input type="button" value="click me" ng-click="alertClick()" />
+                    </br>
+                    <div ng-cloak>{{ name }}</div>
+                </div>
+        
+                <div>
+                    <img ng-src={{user.picture.large}}>
+                    <p>{{user.name.title}}. {{user.name.first}} {{user.name.last}}</p>
+                </div>
+        
+                <div>
+                  <label>Add Rule: </label>
+                  <input type="text" ng-model="newRule"/>
+                  <a href="#" class="btn btn-default" ng-click="addRule()">Add</a>
+                </div>
+            </div>
 		</div>
 
     </body>
