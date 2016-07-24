@@ -403,3 +403,44 @@ Then in your html, you can just call that function instead of passing it `handle
   <h1>twitter.com/{{ lowercaseHandle() }}</h1>
 
 ```
+
+
+###Watchers and the Digest Loop
+
+JavaScript Event Loop is extended with Angular to make things easier. You have the JS event loop and then the *Angular Context* added in. When you add variables to the page, Angular knows that it's going to watch for those variables to change. These are called **watchers** that continuesly check if things have changed, this is also called the **Digest Loop**. You can use `$scope.$watch` to set up watches. Although this wouldn't be something you normally do, here is an example of what that would look like.
+
+
+```
+    $scope.$watch('handle', function (newValue, oldValue) {
+        console.info('Changed!');
+        console.log('New Value: ' + newValue);
+        console.log('Old Value: ' + oldValue);
+    });
+
+```
+
+
+Sometimes when you use external libraries or async code like *setTimeout* you need to use the `$apply` method so your app knows that you are want to be listeners from the *digest loop* to be listening. See the below example you use *setTimeout*, then you wrap everything inside of that *setTimeout* with the `$scope.$apply` method. This tells angular that you want the digest loop to run on this code. Without it the view won't update the handle variable when this code executes.
+
+```
+    setTimeout(function () {
+        $scope.$apply(function () {
+            $scope.handle = 'changedTwitterHandle';
+            console.log('It Changed');
+        });
+    }, 3000);
+
+```
+
+In this use case there is a dependency that you can inject to avoid having to use setTimeout and $apply.
+
+
+```
+    $timeout(function() {
+        $scope.handle = 'changedTwitterHangle';
+        console.log('It Changed');
+    }, 3000);
+
+```
+
+
