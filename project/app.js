@@ -43,14 +43,14 @@ myApp.controller('mainController', ['$scope', '$filter', '$timeout', '$http', fu
         console.log('Old Value: ' + oldValue);
     });
     
-    $http.get('https://randomuser.me/api/')
-        .success(function (result) {
-            $scope.user = result.results[0];
-            console.log(result);
-         })
-         .error(function (data, status) {
-             console.log(data, error)
-         });
+    // $http.get('https://randomuser.me/api/')
+    //     .success(function (result) {
+    //         $scope.user = result.results[0];
+    //         console.log(result);
+    //      })
+    //      .error(function (data, status) {
+    //          console.log(data, error)
+    //      });
     
     
     
