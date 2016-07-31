@@ -652,3 +652,111 @@ This code will update the rules list dynamically as we make the post request thr
     };
 
 ```
+
+###Multiple Controllers and Views
+
+You can have as many controllers as you want withing Angular, that even use the same $scope variable names. Below you see two controllers declared `mainController` and `secondController`. There have different scopes and you can access  both of them within the same view.
+
+```
+
+var myApp = angular.module('myApp', []);
+
+myApp.controller('mainController', ['$scope', function($scope) {
+    $scope.name = "Main";
+}]);
+
+
+myApp.controller('secondController', ['$scope', function($scope) {
+    $scope.name = "Second";
+}]);
+
+
+```
+
+In the view:
+
+```
+    <div class="container">
+       <div ng-controller="mainController">
+           <h1>{{ name }}</h1>
+       </div>
+	</div>
+        
+    <div class="container">
+       <div ng-controller="secondController">
+           <h1>{{ name }}</h1>
+       </div>
+	</div>
+
+```
+
+###Single Page Apps and the Hash
+
+There's and old concept in HTML that you anchor elements on the page with an id, and your able to call that id with an href on an anchor tag. The set up is as below:
+
+Below you see an element with an id of `bookmark`, this is the element you wish to scroll to when you click the bookmark
+
+```
+  <p id='bookmark'>
+    Hello World                      
+  </p>
+
+```
+
+Then somewhere else you make an anchor tag that has an href of `#bookmark` which when clicked will bring you to the area on the page where the above element is tagged, matching the id name to the href name for the destination.
+
+
+```
+  <div>
+    <a href="#bookmark">Click here to go to bookmark</a>
+  </div>
+
+```
+
+This idea has been around for a while in html and allows you to bookmark locations on the page. This `#bookmark` is also known as a **fragment identifier**. 
+
+
+So in JavaScript there is an event called `hashchange` which listens for the hash changing. So if you were to implement the below code with the above code when you click the link it will fire the console.log. Its important to note that the **fragment identifier** doesn't even need to exist on the page for this event listener to register a hash change. 
+
+```
+window.addEventListener('hashchange', function () {
+   console.log('hash changed! : ' + window.location.hash); 
+});
+
+```
+
+
+Now imaging for a single page app you could have these *hashchange* events trigger events in JavaScript, maybe sending over new content or causing something else to change when a certain hash exists. Since the page doesn't exist, this is the beginning of a Single Page App and the beginning of how Angualar approaches them.
+
+```
+    <div>
+        <a href="#bookmark/1">Click here to go to bookmark 1</a>
+        </br>
+        <a href="#bookmark/2">Click here to go to bookmark 2</a>
+        </br>
+        <a href="#bookmark/3">Click here to go to bookmark 3</a>
+    </div>
+
+```
+
+
+```
+window.addEventListener('hashchange', function () {
+    
+   var hash = window.location.hash;
+    
+    if(hash === '#bookmark/1'){
+        console.log('Bookmark One');
+    }
+    
+    if(hash === '#bookmark/2'){
+        console.log('Bookmark Two');
+    }
+    
+    if(hash === '#bookmark/3'){
+        console.log('Bookmark Three');
+    }
+    
+});
+
+```

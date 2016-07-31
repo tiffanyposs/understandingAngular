@@ -43,6 +43,8 @@ myApp.controller('mainController', ['$scope', '$filter', '$timeout', '$http', fu
         console.log('Old Value: ' + oldValue);
     });
     
+    
+    //http request
     // $http.get('https://randomuser.me/api/')
     //     .success(function (result) {
     //         $scope.user = result.results[0];
@@ -53,7 +55,7 @@ myApp.controller('mainController', ['$scope', '$filter', '$timeout', '$http', fu
     //      });
     
     
-    
+//    if you had a local api from your server
 //    var rulesrequest = new XMLHTTPRequest();
 //    rulesrequest.onreadystatechange = function () {
 //        $scope.$apply(function() {
@@ -81,5 +83,12 @@ myApp.controller('mainController', ['$scope', '$filter', '$timeout', '$http', fu
 //        $scope.handle = 'changedTwitterHangle';
 //        console.log('It Changed');
 //    }, 3000);
+    
+}]);
+
+
+myApp.controller('secondController', ['$scope', function ($scope) {
+    
+    $scope.messege = 'Hello from the second controller'
     
 }]);
