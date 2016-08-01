@@ -760,3 +760,112 @@ window.addEventListener('hashchange', function () {
 });
 
 ```
+
+
+###Routing, Templates, and Controllers
+
+####Part One
+
+See the `example_one` folder for the working example
+
+You can inject the `$location` service and see that it has the ability to see the pathname within it by calling the `$location.path()` method. It will return the hash that is currently in place on pageload. This is just an example showing that angular can get the hash
+
+```
+var myApp = angular.module('myApp', []);
+
+myApp.controller('mainController', ['$scope', '$location', '$log', function($scope, $location, $log) {
+    
+    $log.info($location.path());
+ 
+}]);
+
+
+```
+
+You can find the latest version of Angular [here](https://code.angularjs.org/). (The last one that says 'rc' next to it's name) Once you click into it you will see a *service* file called `angular-route.js`, a module called *ngRoute* and it allows you to deal with routes and states within your app.
+
+After we add the service in out index.html file by linking the `angular-route.js` file after we load angular, we can add it to our app. First we can inject the dependecy into our app. It's called `ngRoute`:
+
+```
+var myApp = angular.module('myApp', ['ngRoute']);
+
+```
+
+First we need to make *template* html files. These are partial html files that will be injected into our main one. No need for DOCTYPE etc, this will only be raw html without any style or scripts.
+
+Make a folder in the main level named `pages` with three files inside `main.html`, `second.html`, and `third.html`. You can add basic "Hello from Main.js file" within tags in all of these new files.
+
+Next back in our `index.html` file that contains all the dependencies and has the `<html lang="en-us" ng-app="myApp"></html>` loaded we can add the below line of code within the body. `ng-view` will inject current content based on the route into the app. This content will come from the html files within the `pages` folder we just made:
+
+```
+  <div ng-view></div>
+
+```
+
+
+Lastly we need to link everything up. Back in our `app.js` file we injected the `ngRoute` dependency, then we can call `myApp.config`, pass in a param of `$routeProvider`, then chain `when` methods. The `when` methods take a first object as a pathname (anything that comes after the hash), followed by a second parameter which has a `templateUrl` and `controller` key. `templateUrl` links up the template page you would like to inject into the `ng-view` when that route is triggered un the url. `controller` attaches controllers to that view.
+
+Below we chain 3 `when`s.
+
+```
+  var myApp = angular.module('myApp', ['ngRoute']);
+
+  myApp.config(function($routeProvider) {
+   $routeProvider
+       .when('/', {
+            templateUrl: 'pages/main.html',
+            controller: 'mainController'
+       })
+       .when('/second', {
+            templateUrl: 'pages/second.html',
+            controller: 'secondController'
+       })
+       .when('/third', {
+            templateUrl: 'pages/third.html',
+            controller: 'thirdController'
+       });
+  });
+
+
+```
+Lastly, we create multiple controllers to reflect the ones we attached above.
+
+
+```
+  myApp.controller('mainController', ['$scope', '$location', '$log', function($scope, $location, $log) {
+    
+    $log.info('First Controller : ' + $location.path());
+ 
+  }]);
+
+
+  myApp.controller('secondController', ['$scope', '$location', '$log', function($scope, $location, $log) {
+    
+    $log.info('Second Controller : ' + $location.path());
+ 
+  }]);
+
+
+  myApp.controller('thirdController', ['$scope', '$location', '$log', function($scope, $location, $log) {
+    
+    $log.info('Third Controller : ' + $location.path());
+ 
+  }]);
+
+
+```
+
+So when you launch you app, going to `/#` empty hash will serve the `main.html` template into the `index.html` file, `/#second` will serve `second.html`, and `/#third` will serve `third.html`.
+
+So, you can add the routes to links, for example in the `index.html` you can add the routes we created as *href*s in the nav.
+
+```
+  <nav>
+    <ul class="nav navbar-nav navbar-right">
+		<li><a href="#"><i class="fa fa-home"></i> Home</a></li>
+        <li><a href="#/second">Second</a></li>
+        <li><a href="#/third">Third</a></li>
+	</ul>
+  </nav>
+	
+```

@@ -1,6 +1,8 @@
 var myApp = angular.module('myApp', []);
 
-myApp.controller('mainController', ['$scope', '$filter', '$timeout', '$http', function ($scope, $filter, $timeout, $http) {
+myApp.controller('mainController', ['$scope', '$filter', '$timeout', '$http', '$location', '$log', function ($scope, $filter, $timeout, $http, $location, $log) {
+    
+    $log.info($location.path());
     
     $scope.handle = '';
     $scope.lowercaseHandle = function () {
