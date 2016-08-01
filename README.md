@@ -869,3 +869,48 @@ So, you can add the routes to links, for example in the `index.html` you can add
   </nav>
 	
 ```
+
+####Part Two
+
+You can also do routes that pass in params. For example below we have `/example` route, but we also have `/example/:num`. Adding the `:` allows you to pass that part of the url in as a parameter. So they both use the same template `example.html` but one passes in the `:num` param:
+
+```
+  myApp.config(function($routeProvider) {
+   $routeProvider
+       .when('/example', {
+             templateUrl: 'pages/example.html',
+             controller: 'exampleController'
+       })
+       .when('/example/:num', {
+             templateUrl: 'pages/example.html',
+             controller: 'exampleController'
+       })
+  });
+
+
+```
+
+In the controller you can inject the dependecy `$routeParams` from the `ngRoute` module. When you `$log` `$routeParams` you will see that it is an object containing all the params you passed into the param from above, in this case just `/:num`. We set `$scope.num` to `$routeParams.num` then it's available in the view. If the user goes to `#/example/123` num will equal **123**.
+
+```
+  myApp.controller('exampleController', ['$scope', '$location', '$log', '$routeParams', function($scope, $location, $log, $routeParams) {
+    
+    $log.info('Example Controller : ' + $location.path());
+    $log.info($routeParams);
+    
+    $scope.name = 'Example';
+    $scope.num = $routeParams.num || 0;
+ 
+  }]);
+
+
+```
+
+Then in `example.html` you can have something like this:
+
+```
+  <h1>This is the {{ name }} controller</h1>
+
+  <p>You are on {{ name }} page number {{ num }}. </p>
+
+```

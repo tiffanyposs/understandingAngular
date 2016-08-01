@@ -13,7 +13,15 @@ myApp.config(function($routeProvider) {
        .when('/third', {
             templateUrl: 'pages/third.html',
             controller: 'thirdController'
-       });
+       })
+       .when('/example', {
+             templateUrl: 'pages/example.html',
+             controller: 'exampleController'
+       })
+       .when('/example/:num', {
+             templateUrl: 'pages/example.html',
+             controller: 'exampleController'
+       })
 });
 
 myApp.controller('mainController', ['$scope', '$location', '$log', function($scope, $location, $log) {
@@ -38,3 +46,19 @@ myApp.controller('thirdController', ['$scope', '$location', '$log', function($sc
     $scope.name = 'Third';
  
 }]);
+
+
+
+myApp.controller('exampleController', ['$scope', '$location', '$log', '$routeParams', function($scope, $location, $log, $routeParams) {
+    
+    $log.info('Example Controller : ' + $location.path());
+    $log.info($routeParams);
+    
+    $scope.name = 'Example';
+    $scope.num = $routeParams.num || 0;
+ 
+}]);
+
+
+
+
