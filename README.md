@@ -12,6 +12,7 @@
   * "Create This" 
 * **Interpolation** - Creating a string by combining a string and placeholders.
 * **Minification** - Shrinking the size of files for faster download.
+* **Singleton** - the one and only copy of an object
 
 ####Problems Angular is trying
 
@@ -554,7 +555,7 @@ Then you can set `ng-click` equal to the function call. So when you click the bu
 
 ####ng-cloak
 
-`ng-cloak` is an Angular property that allows you to hide an element until Angular gets to thit. This prevents a flicker on slow internet connections that might cause an user to see the templating `{{}}` before Angular renders the variable.
+`ng-cloak` is an Angular property that allows you to hide an element until Angular gets to it. This prevents a flicker on slow internet connections that might cause an user to see the templating `{{}}` before Angular renders the variable.
 
 ```
   <div ng-cloak>{{ name }}</div>
@@ -655,7 +656,7 @@ This code will update the rules list dynamically as we make the post request thr
 
 ###Multiple Controllers and Views
 
-You can have as many controllers as you want withing Angular, that even use the same $scope variable names. Below you see two controllers declared `mainController` and `secondController`. There have different scopes and you can access  both of them within the same view.
+You can have as many controllers as you want within Angular, that even use the same $scope variable names. Below you see two controllers declared `mainController` and `secondController`. There have different scopes and you can access  both of them within the same view.
 
 ```
 
@@ -768,7 +769,7 @@ window.addEventListener('hashchange', function () {
 
 See the `example_one` folder for the working example
 
-You can inject the `$location` service and see that it has the ability to see the pathname within it by calling the `$location.path()` method. It will return the hash that is currently in place on pageload. This is just an example showing that angular can get the hash
+You can inject the `$location` service and see that it has the ability to see the pathname within it by calling the `$location.path()` method. It will return the hash that is currently in place on page load. This is just an example showing that angular can get the hash
 
 ```
 var myApp = angular.module('myApp', []);
@@ -784,7 +785,7 @@ myApp.controller('mainController', ['$scope', '$location', '$log', function($sco
 
 You can find the latest version of Angular [here](https://code.angularjs.org/). (The last one that says 'rc' next to it's name) Once you click into it you will see a *service* file called `angular-route.js`, a module called *ngRoute* and it allows you to deal with routes and states within your app.
 
-After we add the service in out index.html file by linking the `angular-route.js` file after we load angular, we can add it to our app. First we can inject the dependecy into our app. It's called `ngRoute`:
+After we add the service in out index.html file by linking the `angular-route.js` file after we load angular, we can add it to our app. First we can inject the dependency into our app. It's called `ngRoute`:
 
 ```
 var myApp = angular.module('myApp', ['ngRoute']);
@@ -890,7 +891,7 @@ You can also do routes that pass in params. For example below we have `/example`
 
 ```
 
-In the controller you can inject the dependecy `$routeParams` from the `ngRoute` module. When you `$log` `$routeParams` you will see that it is an object containing all the params you passed into the param from above, in this case just `/:num`. We set `$scope.num` to `$routeParams.num` then it's available in the view. If the user goes to `#/example/123` num will equal **123**.
+In the controller you can inject the dependency `$routeParams` from the `ngRoute` module. When you `$log` `$routeParams` you will see that it is an object containing all the params you passed into the param from above, in this case just `/:num`. We set `$scope.num` to `$routeParams.num` then it's available in the view. If the user goes to `#/example/123` num will equal **123**.
 
 ```
   myApp.controller('exampleController', ['$scope', '$location', '$log', '$routeParams', function($scope, $location, $log, $routeParams) {
@@ -912,5 +913,85 @@ Then in `example.html` you can have something like this:
   <h1>This is the {{ name }} controller</h1>
 
   <p>You are on {{ name }} page number {{ num }}. </p>
+
+```
+
+
+
+###Services and Singletons
+
+A *Singleton* is an object there there is only one copy of. You can imagine that you have two controllers. We mass in the `$log` param. one would think that $log would be it's own instance within each function but it is not. `$log` is a *singleton*. If you load the main page, the `testOne` property will be set. Then when you go to the second page, both the `testOne` and the `testTwo` properties exist.
+
+
+```
+myApp.controller('mainController', ['$scope', '$log', function($scope, $log) {
+    $log.testOne = "Test One";
+    console.log($log);
+}]);
+
+myApp.controller('secondController', ['$scope', '$log', '$routeParams', function($scope, $log, $routeParams) {
+    $log.testTwo = "Test Two";
+    console.log($log);
+    
+}]);
+
+```
+
+
+Not all services are *singletons* though. `$scope` is an exception to the rule. It is a *child scope* inherited from a parent and unique for every controller.
+
+###Custom Services
+
+Creating custom services is easy to do. Once you initialize your `myApp` module you can create a service by simply passing the `service` method a service name and function. Once you do that it's like creating a constructor. You can add methods and variables that you would like to provide in your service. 
+
+```
+myApp.service('serviceName', function() {
+    var self = this;
+    this.name = "John Doe";
+    this.nameLength = function(){
+        return self.name.length
+    }
+});
+
+```
+
+Once you create the service you can inject it into controllers just like you would for any other service. The service you create is also a *singleton*. When you set the `$scope` to be equal to a service variable, the scope won't update automatically,  you must add a `$watch` to it to update the service name when you switch between pages in a SPA.
+
+```
+myApp.controller('mainController', ['$scope', '$log', 'serviceName', function($scope, $log, serviceName) {
+    $scope.name = serviceName.name;
+    $scope.$watch('name', function(){
+       serviceName.name = $scope.name; 
+    });
+}]);
+
+myApp.controller('secondController', ['$scope', '$log', '$routeParams', 'serviceName', function($scope, $log, $routeParams, serviceName) {
+    $scope.name = serviceName.name;
+    $scope.$watch('name', function(){
+       serviceName.name = $scope.name; 
+    });
+}]);
+
+
+```
+
+Your HTML might look like something like this:
+
+`main.html`
+
+```
+  <h1>This is Main.</h1>
+  </hr>
+  <input type='text' ng-model='name'>
+
+```
+
+`second.html`
+
+```
+  <h1>This is second.</h1>
+  <h3>Scope route value (on second page): {{ num }}</h3>
+  </hr>
+  <input type='text' ng-model='name'>
 
 ```
