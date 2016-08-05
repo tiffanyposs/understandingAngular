@@ -1,1 +1,3 @@
-var search-link-href = "#";
+//var search-link-href = "#";
+
+var searchLinkHref = "#";
