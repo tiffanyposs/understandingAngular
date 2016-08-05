@@ -1,0 +1,1 @@
+var search-link-href = "#";

@@ -12,6 +12,7 @@
   * "Create This" 
 * **Interpolation** - Creating a string by combining a string and placeholders.
 * **Minification** - Shrinking the size of files for faster download.
+* **Normalize** - To make consistent to a standard
 * **Singleton** - the one and only copy of an object
 
 ####Problems Angular is trying
@@ -995,3 +996,25 @@ Your HTML might look like something like this:
   <input type='text' ng-model='name'>
 
 ```
+
+
+
+###Reusable Components
+
+Web components is the concept of creating reusable html containers that you can populate with other html. So you html is not so repetitive. Custom directives is Angular's solution to this.
+
+
+####Normalize
+
+Normalize means to make consistent to a standard. To convert a string or numbers etc to a consistent state. This is an important concept to remember when it comes to *custom directives*.
+
+In Angular you can create a custom directive. On the html side it looks something like the below. Notice that the tag and the attribute are both using snake case (with hyphens). This makes it east to read, but also is the standard because Angular's JavaScript will normalize these into camel case.
+
+```
+  <search-result result-link-href="#"></search-result>
+
+```
+
+The reason why Angular converts it to camel case is because variable names cannot contain hyphens. This is because a hyphen can be mistaken as the *minus* operator. This would throw an error: `var search-link-href = "#";`. This would not throw an a error `var searchLinkHref = "#";`  So, Angular converts the hyphened names into camel case, Angular *Normalizes* it into a JavaScript readable format, and vis versa.
+
+
