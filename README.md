@@ -1018,3 +1018,60 @@ In Angular you can create a custom directive. On the html side it looks somethin
 The reason why Angular converts it to camel case is because variable names cannot contain hyphens. This is because a hyphen can be mistaken as the *minus* operator. This would throw an error: `var search-link-href = "#";`. This would not throw an a error `var searchLinkHref = "#";`  So, Angular converts the hyphened names into camel case, Angular *Normalizes* it into a JavaScript readable format, and vis versa.
 
 
+###Custom Directives
+
+Making a custom directive is easy. When you have a snippet of code that will be used through out your app, you can use a directive to send over a template.
+
+Below you see you can all the *directive* method, and first pass it a *normalized* name followed by an object. The name will be in camel case in the directive, but on the front end (in the html) it will be snake case with hyphens. 
+
+In the object you can set the template key to the html that directive contains. Then the *replace* key defaults to false, but you can change it to true if would like the target element on the fronting to be replaced by the template instead of going inside of it.
+
+`app.js`:
+
+```
+  myApp.directive('searchResults', function() {
+    return {
+        template: '<a href="#" class="list-group-item"><h4 class="list-group-item-heading">Doe, John</h4><p class="list-group-item-text">555 Main Street</p></a>',
+        replace: true
+    }
+  });
+
+```
+
+Below you can see what this directive would look like on the front end. There are two common ways to call it. One is to use it as a tag `<search-results>` the other is to add it as an attribute like the example below. Both of these will be replaced with the above template.
+
+`main.html`
+
+```
+
+  <div class="list-group">
+    <search-results></search-results>
+    <div search-results></div>
+  </div>
+
+```
+
+
+It's also interesting to note you can control which way the directive can be implemented. The directive defaults to allowing Elements and attributes like the above html. The restrict key for the directive can be added to the object, which you can then pass `E` for element and `A` for attribute if you would like to restrict which one your devs can use. 
+
+```
+  restrict: 'AE'
+
+```
+
+Also `C` for class and `M` for comment are available
+
+```
+  restrict: 'AECM'
+
+```
+
+One the front end the class and comment versions look like this:
+
+```
+  <div class="list-group">
+    <div class='search-results'></div>
+    <!-- directive: search-results -->
+  </div>
+
+```
