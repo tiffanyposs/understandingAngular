@@ -1075,3 +1075,167 @@ One the front end the class and comment versions look like this:
   </div>
 
 ```
+
+####Templates
+
+Instead of using the template key, which the value can get messy with a bunch of html, you can use the `templateUrl` key, which references and html file you might put in a directives folder.
+
+```
+  templateUrl: 'directives/searchresults.html',
+
+```
+
+####Directives and Scope
+
+Directives by default have access to all the `$scope` variables in the model, this can be dangerous when building larger applications.
+
+Simply add the *scope* key and pass it an empty object will prevent it from having any access to the $scope within the directive or it's html
+
+`app.js`
+
+```
+  myApp.directive('searchResults', function() {
+    return {
+        templateUrl: 'directives/searchresults.html',
+        replace: true,
+        scope: {
+
+        }
+    }
+  });
+
+```
+
+What if we do want some access? We can add variable as we need them. For example, in the `<search-results>` tag we can add an attribute and set it equal to the scope object we are trying to have access to:
+
+`main.html`
+
+```
+  <search-results person-name = "{{ person.name }}"></search-results>
+  
+```
+
+Now within the scope object in the directive, we can add a property `personName` which is the *normalized* version of `person-name` attribute. Then we pass it `@` which simply means text to angular.
+
+`app.js`
+
+```
+
+  scope: {
+     personName: "@"
+  }
+        
+```
+
+Now within our template html file we can access a new variable, instead of `person.name` it will be `personName`.
+
+```
+  <h4 class="list-group-item-heading">{{ personName }}</h4>
+  
+```
+
+*Note that this way of doing it with the individual binding is One-Way Binding. The $scope object variables will not be altered.*
+
+####Adding $scope objects
+
+You can also add scope objects.
+
+You can add a $scope object by setting an attribute to the name of the scope object
+
+`main.html`
+
+```
+  <search-results person-object="person"></search-results>
+
+
+```
+
+Then you can set the *normalized* attribute name in camel case equal to `=` which means object. This has two-way binding, so be careful how you use it.
+
+`app.js`
+
+```
+  myApp.directive('searchResults', function() {
+    return {
+        restrict: 'AECM',
+        templateUrl: 'directives/searchresults.html',
+        replace: true,
+        scope: {
+            personObject: "="
+        }
+    }
+});
+
+
+```
+
+Lastly, you can utilize it in your template file.
+
+`searchresults.html`
+
+```
+  <a href="#" class="list-group-item">
+	<h4 class="list-group-item-heading">{{ personObject.name }}</h4>
+	<p class="list-group-item-text">
+		{{ personObject.address }}
+	</p>
+  </a>
+  
+```
+
+####Adding $scope functions
+
+You can also pass functions to the directive.
+
+To start you can create a function in your controller.
+
+`app.js`
+
+```
+  myApp.controller('mainController', ['$scope', '$log', function($scope, $log) {
+    $scope.person = {
+        name: 'John',
+        address: '555 Main Street',
+        city: 'Sunnyville',
+        state: 'CA',
+        zipcode: '90210'
+    }
+    $scope.formattedAddress = function(person) {
+        return person.address + ', ' + person.city + ', ' + person.state + ' ' + person.zipcode;
+    }
+  }]);
+
+```
+
+Next you can create an attribute for the function and pass it a placeholder param (this is not yet the value)
+
+`main.html`
+
+```
+  <search-results person-object="person" formatted-address-function="formattedAddress(aperson)"></search-results>
+
+```
+
+Back in your directive, you can alter the scope object. See below we added the *normalized* version of the attribute, and set it to `&`, this means function in Angular.
+
+`app.js`
+
+```
+  scope: {
+       personObject: "=",
+       formattedAddressFunction: "&"
+  }
+
+```
+
+Lastly, you can utilize it in your template file. For functions you call the function, but you have to pass in an object with key value pairs. The key will be the placeholder name you passed in on the `main.html` page, they key will be the actual object you want to pass in. If there happened to be more than one param, you would just list them in the object.
+
+`searchresults.html`
+
+
+```
+  <p class="list-group-item-text">
+        {{ formattedAddressFunction( {aperson: personObject} ) }}
+  </p>
+
+```
