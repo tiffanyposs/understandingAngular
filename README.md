@@ -5,6 +5,7 @@
 
 ###Big Words Defined
 
+* **Compile and Link** - When building code, the compiler converts code to a low level language, then the linker generates a file that the computer will actually interact with.
 * **Dependency Injection** - Giving a function an object. Rather than creating an object inside of a function, you pass it to a function.
 * **Directive** - An instruction to Angular.js to manipulate a piece of the DOM
   * "Add a Class"
@@ -14,6 +15,7 @@
 * **Minification** - Shrinking the size of files for faster download.
 * **Normalize** - To make consistent to a standard
 * **Singleton** - the one and only copy of an object
+* **Transclution** - Including one document inside another.
 
 ####Problems Angular is trying
 
@@ -1237,5 +1239,151 @@ Lastly, you can utilize it in your template file. For functions you call the fun
   <p class="list-group-item-text">
         {{ formattedAddressFunction( {aperson: personObject} ) }}
   </p>
+
+```
+
+####Repeated Directives
+
+You can use `ng-repeat` repeat a directive. Simply you can make your *$scope* object be an array of objects.
+
+`app.js`
+
+```
+  $scope.people = [
+        {
+        name: 'John Doe',
+        address: '555 Main St.',
+        city: 'New York',
+        state: 'NY',
+        zip: '11111'
+        },
+        {
+        name: 'Jane Doe',
+        address: '555 Brookyn Ave.',
+        city: 'Brooklyn',
+        state: 'NY',
+        zip: '10025'
+        }
+  ];
+
+```
+
+Then simply you can add `ng-repeat` to your directive. See below how we add `ng-repeat` directly to the directive. Then we write `person in people` to loop through the above *$scope* array. 
+
+```
+  <div class="list-group">
+    <search-result person-object="person" formatted-address-function="formattedAddress(aperson)" ng-repeat="person in people"></search-result>
+  </div>
+
+```
+
+###Compile
+
+*Compiling and Linking* is when building code, the compiler converts code to a low level language, then the linker generates a file that the computer will actually interact with. This is a very computer science term.
+
+Within a directive, you can add a `compile` key that will run once when you load a directive, then what it returns is an object with a `pre` key and a `post` key. You will see when you run the below example in reference to the above example with the multiple elements in the `$scope.people` array, that you will have compile run once and the `pre` and `post` functions will run once for each object in the array.
+
+`app.js`
+
+```
+  compile: function(elem, attrs) {
+     console.log('Compiling...');
+     console.log(elem.html());
+     return {
+         pre: function(scope, element, attrs) {
+             console.log('Prelinking...');
+             console.log(element);
+          },
+          post: function(scope, element, attrs) {
+              console.log('Postlinking...');
+              console.log(element);
+          }
+      }
+           
+   }
+
+```
+
+Angular docs suggest to never use `pre`, and that `post` is safer. So below we show a simple example on how you can manipulate each element as you loop through. Below we check if the *personObject* has a name of *Jane Doe*, if it does we manipulate that specific element by removing the class.
+
+
+```
+  post: function(scope, elements, attrs) {
+     console.log(scope);
+     if(scope.personObject.name === "Jane Doe") {
+        elements.removeAttr('class');
+     }
+     console.log('Postlinking...');
+     console.log(elements);
+  }
+
+```
+
+When would you use this technique? You would use this when the html in the directive needs to be manipulated by JavaScript.
+
+
+####Link - The better way
+
+Instead of using `compile`, `post`, and `pre` it's recommended to use `link`. You can use it similarly to the above examples using *post*.
+
+`app.js`
+
+
+```
+  link: function(scope, elements, attr) {
+      console.log(scope);
+      console.log('Linking...');
+      if(scope.personObject.name === "Jane Doe") {
+          elements.removeAttr('class');
+      }   
+      console.log(elements);
+  }
+
+```
+
+
+
+####Transclution
+
+**Transclution** is when you including one document inside another. In angular you might want to add some static html inside of your directive. There are three steps to this:
+
+_____
+
+
+Maybe we want to include a footnote in our search results. If we just add some html inside of the `search-result` directive in the html it's going to be replaced by the directive content, but this is the first step.
+
+`main.html`
+
+```
+  <div class="list-group">
+    <search-result person-object="person" formatted-address-function="formattedAddress(aperson)" ng-repeat="person in people">  
+        *Search Results May Not Be Valid
+    </search-result>
+  </div>
+
+```
+
+Next you can add a `ng-transclude` tag to your directive content page. Wherever you add the tag is where the static html will go. You can also add it as an attribute to any tag you wish. 
+
+`searchresult.html`
+
+```
+  <a href="#" class="list-group-item">
+    <h4 class="list-group-item-heading">{{ personObject.name }}</h4>
+    <p class="list-group-item-text">
+        {{ formattedAddressFunction({ aperson: personObject }) }}
+    </p>
+  <!--    <small><ng-transclude></ng-transclude></small>-->
+    <small ng-transclude></small>
+  </a>
+
+```
+
+Lastly within your directive you can add a `transclude` key and set it to true. It defaults to false.
+
+`app.js`
+
+```
+  transclude: true
 
 ```
